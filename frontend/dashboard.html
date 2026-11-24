@@ -1,0 +1,584 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="description"
+        content="TerraGuard AI environmental and weather monitoring dashboard">
+
+    <title>TerraGuard AI | Dashboard</title>
+
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/assistant.css">
+
+    <!-- Leaflet Map CSS -->
+    <link
+        rel="stylesheet"
+        href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+        crossorigin=""
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    >
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+
+        <div class="logo">
+            <i class="fa-solid fa-earth-asia"></i>
+            <span>TerraGuard</span>
+        </div>
+
+        <p class="menu-label">MAIN MENU</p>
+
+        <nav class="sidebar-nav">
+
+            <a href="#overview" class="nav-link active">
+                <i class="fa-solid fa-chart-pie"></i>
+                Overview
+            </a>
+
+            <a href="#risk-map" class="nav-link">
+                <i class="fa-solid fa-map-location-dot"></i>
+                Risk Map
+            </a>
+
+            <a href="#weather" class="nav-link">
+                <i class="fa-solid fa-cloud-rain"></i>
+                Weather
+            </a>
+
+            <a href="#alerts" class="nav-link">
+                <i class="fa-solid fa-bell"></i>
+                Alerts
+            </a>
+
+            <a href="#assistant" class="nav-link">
+                <i class="fa-solid fa-robot"></i>
+                AI Assistant
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="#data-disclaimer" class="nav-link">
+                <i class="fa-solid fa-gear"></i>
+                Settings
+            </a>
+
+            <div class="profile">
+                <div class="avatar">SM</div>
+
+                <div>
+                    <strong>Project Admin</strong>
+                    <small>Administrator</small>
+                </div>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <header class="topbar">
+
+            <div>
+                <h2>Dashboard Overview</h2>
+                <p>Welcome to TerraGuard Intelligence Platform</p>
+            </div>
+
+            <div class="top-actions">
+
+                <span class="system-status">
+                    <span class="green-dot"></span>
+                    System Online
+                </span>
+
+                <button class="icon-button"
+                    aria-label="Notifications">
+
+                    <i class="fa-regular fa-bell"></i>
+
+                </button>
+
+            </div>
+
+        </header>
+
+
+        <!-- WELCOME -->
+        <section class="welcome-section" id="overview">
+
+            <div>
+
+                <p class="small-heading">
+                    ENVIRONMENTAL MONITORING
+                </p>
+
+                <h1>Good to see you!</h1>
+
+                <p>
+                    Monitor environmental conditions and understand
+                    potential landslide hazards.
+                </p>
+
+            </div>
+
+            <div class="date-box" id="currentDate">
+                Loading date...
+            </div>
+
+        </section>
+
+
+        <!-- LOCATION SEARCH -->
+        <section class="location-search panel">
+
+            <div class="search-heading">
+
+                <div>
+                    <h3>Search Monitoring Location</h3>
+
+                    <p>
+                        Enter a city or location to retrieve its weather.
+                    </p>
+                </div>
+
+                <i class="fa-solid fa-location-dot"></i>
+
+            </div>
+
+
+            <div class="search-controls">
+
+                <input
+                    type="text"
+                    id="locationInput"
+                    placeholder="Example: Guwahati, Assam"
+                    autocomplete="off"
+                    aria-label="Enter monitoring location"
+                >
+
+                <button id="searchLocationBtn" type="button">
+
+                    <i class="fa-solid fa-magnifying-glass"></i>
+
+                    Search Location
+
+                </button>
+
+                <button
+                    id="clearLocationBtn"
+                    type="button"
+                    class="clear-button"
+                >
+
+                    Clear
+
+                </button>
+
+            </div>
+
+
+            <p
+                id="searchMessage"
+                class="search-message"
+                aria-live="polite"
+            >
+                Search for a location to load weather information.
+            </p>
+
+
+            <div
+                id="selectedLocation"
+                class="selected-location"
+                hidden
+            >
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                <span id="selectedLocationName"></span>
+
+            </div>
+
+        </section>
+
+
+        <!-- WEATHER STATUS -->
+        <section class="weather-status panel" id="weather">
+
+            <div>
+                <span class="status-label">CURRENT WEATHER</span>
+
+                <h3 id="weatherCondition">
+                    No weather data loaded
+                </h3>
+
+                <p id="weatherLocation">
+                    Select a location to begin.
+                </p>
+            </div>
+
+            <div class="weather-update">
+                <i class="fa-regular fa-clock"></i>
+
+                <span id="weatherUpdated">
+                    Waiting for data
+                </span>
+            </div>
+
+        </section>
+
+
+        <!-- WEATHER STATISTICS -->
+        <section class="stats-grid">
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-cloud-rain"></i>
+                </div>
+
+                <p>Current Precipitation</p>
+
+                <h2 id="rainfall">
+                    -- <small>mm</small>
+                </h2>
+
+                <span>Current weather observation</span>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-temperature-half"></i>
+                </div>
+
+                <p>Temperature</p>
+
+                <h2 id="temperature">
+                    -- <small>°C</small>
+                </h2>
+
+                <span>Air temperature</span>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon green">
+                    <i class="fa-solid fa-droplet"></i>
+                </div>
+
+                <p>Humidity</p>
+
+                <h2 id="humidity">
+                    -- <small>%</small>
+                </h2>
+
+                <span>Relative humidity</span>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-icon blue">
+                    <i class="fa-solid fa-cloud-showers-heavy"></i>
+                </div>
+
+                <p>7-Day Rainfall</p>
+
+                <h2 id="rainfall7d">-- <small>mm</small></h2>
+
+                <span>Accumulated precipitation</span>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="stat-icon orange">
+                    <i class="fa-solid fa-wind"></i>
+                </div>
+
+                <p>Wind Speed</p>
+
+                <h2 id="windSpeed">-- <small>km/h</small></h2>
+
+                <span>Current 10 m wind speed</span>
+
+            </div>
+
+            <div class="stat-card">
+
+                <div class="stat-icon red">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+
+                <p>Risk Indicator</p>
+
+                <h2 id="riskLevel">Unassessed</h2>
+
+                <span>Not an official warning</span>
+
+            </div>
+
+        </section>
+
+
+        <!-- CURRENT ASSESSMENT EXPLANATION -->
+        <section class="panel assessment-panel" id="assessment-details">
+            <div class="panel-header">
+                <div>
+                    <h3>Current Risk Screening Details</h3>
+                    <p>Transparent explanation of the latest rule-based result</p>
+                </div>
+                <span class="preview-label">SCREENING DETAILS</span>
+            </div>
+            <div class="assessment-details-grid">
+                <div class="assessment-score-block">
+                    <span class="status-label">LATEST SCORE</span>
+                    <strong id="assessmentScore">--<small> / 85</small></strong>
+                    <span id="assessmentMethod">Run a location assessment to view the method.</span>
+                </div>
+                <div class="assessment-factor-block">
+                    <h4>Contributing indicators</h4>
+                    <ul id="riskFactors" class="risk-factor-list"><li>Search for a location to calculate its screening indicators.</li></ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- MONITORING SECTION -->
+        <section class="content-grid">
+
+
+            <!-- INTERACTIVE MAP PANEL -->
+            <div class="panel map-panel" id="risk-map">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>Geographical Monitoring</h3>
+
+                        <p>
+                            Select a location to retrieve its weather information.
+                        </p>
+                    </div>
+
+                    <span class="preview-label">
+                        INTERACTIVE MAP
+                    </span>
+
+                </div>
+
+
+                <!-- LEAFLET MAP -->
+                <div
+                    id="riskMap"
+                    class="risk-map"
+                    aria-label="Interactive geographical map"
+                ></div>
+
+
+                <!-- MAP STATUS -->
+                <p
+                    id="mapStatus"
+                    class="map-status"
+                    aria-live="polite"
+                >
+                    Loading interactive map...
+                </p>
+
+
+                <!-- MAP COORDINATES -->
+                <p
+                    id="mapCoordinates"
+                    class="map-coordinates"
+                >
+                    Select a point on the map to view its coordinates.
+                </p>
+                <div class="map-legend" aria-label="Risk level legend">
+                    <span><i class="legend-dot low"></i> Low</span>
+                    <span><i class="legend-dot moderate"></i> Moderate</span>
+                    <span><i class="legend-dot high"></i> High</span>
+                    <span><i class="legend-dot severe"></i> Severe</span>
+                </div>
+
+            </div>
+
+
+            <!-- ALERT PANEL -->
+            <div class="panel alert-panel" id="alerts">
+
+                <div class="panel-header">
+
+                    <div>
+                        <h3>Recent Alerts</h3>
+
+                        <p>Monitoring notifications</p>
+                    </div>
+
+                    <i class="fa-regular fa-bell"></i>
+
+                </div>
+
+
+                <div class="empty-alert" id="alertsContainer">
+
+                    <i class="fa-solid fa-shield-halved"></i>
+
+                    <h4>No alerts available</h4>
+
+                    <p>
+                        Alerts will appear here when generated.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ANALYTICS -->
+        <section class="panel bottom-panel" id="weather-analytics">
+
+            <div class="panel-header">
+
+                <div>
+                    <h3>Assessment Analytics & History</h3>
+
+                    <p>Recent screening scores and recorded locations</p>
+                </div>
+
+                <span class="preview-label">LIVE DATA</span>
+
+            </div>
+
+
+            <div class="analytics-placeholder" id="analyticsContainer">
+    Loading assessment history...
+</div>
+
+        </section>
+
+
+        <!-- AI ASSISTANT -->
+        <section class="panel assistant-panel" id="assistant">
+            <div class="panel-header">
+                <div>
+                    <h3><i class="fa-solid fa-robot"></i> TerraGuard Risk AI Assistant</h3>
+                    <p>Ask about your dashboard readings, risk factors and preparedness.</p>
+                </div>
+                <span class="preview-label">AI ASSISTANT</span>
+            </div>
+            <div class="chat-prompts">
+                <button type="button" data-chat-prompt="Explain my latest risk score">Explain my risk score</button>
+                <button type="button" data-chat-prompt="What should I do during heavy rain?">Landslide safety tips</button>
+                <button type="button" data-chat-prompt="Explain the rainfall and humidity readings">Explain weather readings</button>
+            </div>
+            <div id="chatMessages" class="chat-messages" aria-live="polite">
+                <div class="chat-message assistant">Hello! I’m TerraGuard Risk Assistant. Search for a location, then ask me to explain its screening result or how to prepare for heavy rain.</div>
+            </div>
+            <form id="chatForm" class="chat-form">
+                <input id="chatInput" type="text" maxlength="2000" placeholder="Ask about risk, rainfall or preparedness..." autocomplete="off" required>
+                <button id="chatSend" type="submit"><i class="fa-solid fa-paper-plane"></i> Send</button>
+            </form>
+            <p class="chat-disclaimer">Responses are informational only. This assistant does not issue official warnings or predict landslides.</p>
+        </section>
+
+        <!-- SETTINGS, METHOD & DATA SOURCES -->
+        <section class="panel settings-panel" id="data-disclaimer">
+            <div class="panel-header">
+                <div>
+                    <h3><i class="fa-solid fa-sliders"></i> Settings & Assessment Information</h3>
+                    <p>How TerraGuard collects data and assigns screening levels</p>
+                </div>
+                <span class="preview-label">TRANSPARENCY</span>
+            </div>
+            <div class="settings-grid">
+                <article class="info-card">
+                    <h4><i class="fa-solid fa-gauge-high"></i> Screening score bands</h4>
+                    <ul class="threshold-list">
+                        <li><span class="legend-dot low"></span><strong>Low</strong><span>0–24 / 85</span></li>
+                        <li><span class="legend-dot moderate"></span><strong>Moderate</strong><span>25–44 / 85</span></li>
+                        <li><span class="legend-dot high"></span><strong>High</strong><span>45–64 / 85</span></li>
+                        <li><span class="legend-dot severe"></span><strong>Severe</strong><span>65–85 / 85</span></li>
+                    </ul>
+                </article>
+                <article class="info-card">
+                    <h4><i class="fa-solid fa-list-check"></i> Factors considered</h4>
+                    <p>Recent 24-hour precipitation, accumulated 7-day precipitation, relative humidity and selected heavy-rain or thunderstorm weather codes.</p>
+                    <p class="muted-note">Terrain, slope angle, soil type, geology, drainage, land use and field sensor observations are not included in this prototype score.</p>
+                </article>
+                <article class="info-card">
+                    <h4><i class="fa-solid fa-database"></i> Data sources</h4>
+                    <p><strong>Weather:</strong> Open-Meteo forecast API</p>
+                    <p><strong>Location search:</strong> Open-Meteo geocoding API</p>
+                    <p><strong>Map:</strong> OpenStreetMap tiles, with Esri fallback</p>
+                    <p><strong>Storage:</strong> MongoDB when configured; temporary in-memory mode otherwise</p>
+                </article>
+                <article class="info-card caution-card">
+                    <h4><i class="fa-solid fa-triangle-exclamation"></i> Important safety notice</h4>
+                    <p>This is an academic screening prototype, not a validated landslide prediction model and not an official warning service. Weather indicators alone cannot confirm or rule out slope failure.</p>
+                    <p><strong>In an emergency:</strong> move away from slopes and follow local disaster-management and government instructions. Do not wait for this dashboard.</p>
+                </article>
+            </div>
+        </section>
+
+        <div class="data-disclaimer">
+            <i class="fa-solid fa-circle-info"></i>
+            Data may be delayed or unavailable. Always verify conditions with official local authorities.
+        </div>
+
+
+        <!-- FOOTER -->
+        <footer>
+            TerraGuard AI © 2026 · Academic Prototype
+        </footer>
+
+    </main>
+
+</div>
+
+
+<!-- ===================================== -->
+<!-- JAVASCRIPT FILES                      -->
+<!-- ===================================== -->
+
+<!-- Load Leaflet FIRST -->
+<script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+></script>
+
+
+<!-- Load Dashboard JavaScript AFTER Leaflet -->
+<script src="js/dashboard.js"></script>
+
+
+</body>
+</html>
